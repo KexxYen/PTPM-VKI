@@ -2,10 +2,10 @@ import logging
 import math
 
 class TriangleCalculate:
-    def calculate(self, leght1, leght2, leght3):
-        self.a = leght1
-        self.b = leght2
-        self.c = leght3 
+    def calculate(self, length1, length2, length3):
+        self.a = length1
+        self.b = length2
+        self.c = length3 
 
         if self.a <= 0 or self.b <= 0 or self.c <= 0 or not math.isfinite(self.a) or not math.isfinite(self.b) or not math.isfinite(self.c):
             logging.warning("Ошибка: стороны должны быть положительными конечными числами")
