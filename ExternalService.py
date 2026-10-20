@@ -8,8 +8,7 @@ logger = logging.getLogger(__name__)
 class ExternalService(ABC):
     @abstractmethod
     def send(self, message):
-        """Отправить строку с результатом операции."""
-
+        pass
 
 class FakeExternalService(ExternalService):
     def send(self, message):
