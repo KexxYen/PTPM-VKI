@@ -11,8 +11,8 @@ class DatabaseRepository:
             """
             CREATE TABLE IF NOT EXISTS comments (
                 id INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
-                message TEXT NOT NULL
+                name TEXT NOT NULL CHECK(length(name) <= 256),
+                message TEXT NOT NULL CHECK(length(message) <= 8096)
             )
             """
         )
