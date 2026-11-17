@@ -1,7 +1,7 @@
 import requests
-
-url = input("Введите URL: ")
-save_path ="/tests/fixtures/comments.html"
+import src.parser as parser
+url = "https://habr.com/ru/articles/1108386/"
+save_path ="tests/fixtures/comments.html"
 
 comments_url = url.rstrip("/") + "/comments/"
 
@@ -17,3 +17,10 @@ with open(save_path, "w", encoding="utf-8") as file:
     file.write(response.text)
 
 print("HTML сохранeн")
+
+parser = parser.ForumParser()
+res = parser.parse_page(url)
+for com in res:
+    print(f"id: {com["id"]}\nname: {com["name"]}\ntext: {com["message"]}\n\n")
+
+print(f"Количество комментариев: {len(res)}")

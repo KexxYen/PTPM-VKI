@@ -1,12 +1,9 @@
-
 from pathlib import Path
 import unittest
 from unittest.mock import Mock
-
 from src.parser import ForumParser
 
-
-FIXTURE = "tests/fixtures/comments.html"
+FIXTURE = Path("tests/fixtures/comments.html")
 
 class ForumParserTests(unittest.TestCase):
 
@@ -15,10 +12,10 @@ class ForumParserTests(unittest.TestCase):
 
         comments = ForumParser().parse_html(html)
 
-        self.assertEqual(len(comments), 9)
-        self.assertEqual(comments[0]["id"], 30591422)
-        self.assertEqual(comments[0]["name"], "InsiderCrush")
-        self.assertIn("Спасибо?", comments[0]["message"])
+        self.assertEqual(len(comments), 12)
+        self.assertEqual(comments[0]["id"], 30643916)
+        self.assertEqual(comments[0]["name"], "slackmanbozeman1110")
+        self.assertIn("Думаю нет", comments[0]["message"])
 
     def test_save_to_db(self):
         repository = Mock()
