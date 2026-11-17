@@ -1,3 +1,4 @@
+
 import requests
 import bs4
 
@@ -9,13 +10,23 @@ class ForumParser:
     def parse_page(self, url: str):
         comments_url = url.rstrip("/") + "/comments/"
 
-        comments_response = requests.get(
-            comments_url, headers=self.headers, timeout=10
+        response = requests.get(
+            comments_url,
+            headers=self.headers,
+            timeout=10
         )
-        comments_response.raise_for_status()
-        comments_bs = bs4.BeautifulSoup(comments_response.text, "html.parser")
+        response.raise_for_status()
 
-        comments = comments_bs.find_all("article", class_="tm-comment-thread__comment")
+        return self.parse_html(response.text)
+
+    def parse_html(self, html: str):
+        bs = bs4.BeautifulSoup(html, "html.parser")
+
+        comments = bs.find_all(
+            "article",
+            class_="tm-comment-thread__comment"
+        )
+
         parsed_comments = []
 
         for comment in comments:
@@ -28,16 +39,18 @@ class ForumParser:
             message_block = comment.find("div", class_="tm-comment__body-content")
             message = message_block.text.strip()
 
-            parsed_comments.append(
-                {
-                    "id": comment_id,
-                    "name": author,
-                    "message": message,
-                }
-            )
+            parsed_comments.append({
+                "id": comment_id,
+                "name": author,
+                "message": message
+            })
 
         return parsed_comments
 
     def save_to_db(self, parsed_data, repository):
         for comment in parsed_data:
-            repository.add(comment["id"], comment["name"], comment["message"])
+            repository.add(
+                comment["id"],
+                comment["name"],
+                comment["message"]
+            )

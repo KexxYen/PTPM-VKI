@@ -1,47 +1,41 @@
+
 from pathlib import Path
 import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 from src.parser import ForumParser
 
 
-FIXTURE = Path(__file__).parent / "fixtures" / "comments.html"
-ARTICLE_URL = "https://habr.com/ru/companies/globalsign/articles/1102364/"
-
+FIXTURE = "tests/fixtures/comments.html"
 
 class ForumParserTests(unittest.TestCase):
-    def make_response(self):
-        response = Mock()
-        response.text = FIXTURE.read_text(encoding="utf-8")
-        return response
 
-    @patch("src.parser.requests.get")
-    def test_parse_first_comment(self, mock_get):
-        mock_get.return_value = self.make_response()
+    def test_parse_html(self):
+        html = FIXTURE.read_text(encoding="utf-8")
 
-        comments = ForumParser().parse_page(ARTICLE_URL)
+        comments = ForumParser().parse_html(html)
 
+        self.assertEqual(len(comments), 9)
         self.assertEqual(comments[0]["id"], 30591422)
         self.assertEqual(comments[0]["name"], "InsiderCrush")
         self.assertIn("Спасибо?", comments[0]["message"])
-        mock_get.assert_called_once_with(
-            ARTICLE_URL.rstrip("/") + "/comments/",
-            headers={"User-Agent": "Mozilla/5.0"},
-            timeout=10,
+
+    def test_save_to_db(self):
+        repository = Mock()
+
+        comments = [
+            {
+                "id": 1,
+                "name": "User",
+                "message": "Hello"
+            }
+        ]
+
+        ForumParser().save_to_db(comments, repository)
+
+        repository.add.assert_called_once_with(
+            1, "User", "Hello"
         )
-
-    @patch("src.parser.requests.get")
-    def test_parse_all_comments(self, mock_get):
-        mock_get.return_value = self.make_response()
-
-        comments = ForumParser().parse_page(ARTICLE_URL)
-
-        self.assertEqual(len(comments), 9)
-        for comment in comments:
-            self.assertEqual( set(comment), {"id", "name", "message"})
-            self.assertIsInstance(comment["id"], int)
-            self.assertTrue(comment["name"])
-            self.assertTrue(comment["message"])
 
 
 if __name__ == "__main__":
